@@ -1,0 +1,230 @@
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<title>Homework 4</title>
+	<style>
+		.wrapper {
+			text-align: center;
+		}
+
+		.button {
+    		position: absolute: top: 50%;
+		}
+	</style>
+
+	<script type="text/javascript">
+
+	function viewXML(){
+		var inputURL = document.getElementById('url_box').value;
+        if (inputURL == ""){
+            alert("Error: no XML file input");
+        }
+        else{
+            function loadXML(url) {
+
+     			if (window.XMLHttpRequest) { // code for IE7+, Firefox, Chrome, Opera, Safari
+      				xmlhttp = new XMLHttpRequest();   
+      			}else { // code for IE6, IE5
+   					xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");  
+   				}
+ 				
+ 			  xmlhttp.open("GET",url,false);
+        xmlhttp.send();
+        if (xmlhttp.status == "404") {
+          alert("File does not exist!")
+        }else{
+          xmlDoc = xmlhttp.responseXML;
+          return xmlDoc;   
+        }
+    }
+ 
+ 			xmlDoc = loadXML(inputURL);
+
+            if (window.ActiveXObject) //if IE, simply execute script (due to async prop).
+			{	
+				if (xmlDoc.parseError.errorCode != 0) {
+   					var myErr = xmlDoc.parseError;
+   					generateError();
+                    return(null);
+ 				} else {  
+ 					generateHTML(xmlDoc);  
+                }
+			}else {//else if FF, execute script once XML object has loaded
+                if (xmlDoc.documentElement.nodeName=="parsererror") {
+                    generateError();
+                    return(null);
+                }else{
+				    xmlDoc.onload = generateHTML(xmlDoc);
+   	            }
+            }
+			//hWin.document.close();
+        }
+    }
+
+    function generateError(){
+        alert("Error in XML file");
+    }
+
+	function generateHTML(xmlDoc) {  
+			//root=xmlDoc.DocumentElement;
+
+			ELEMENT_NODE = 1;
+			html_text = "<table border='2'>";
+			html_text += "<th>COMMON</th><th>BOTANICAL</th><th>ZONE</th><th>LIGHT</th><th>PRICE</th><th>IMAGE</th>"
+        
+      if(!xmlDoc.firstChild.hasChildNodes()){
+        alert("Catalog does not contain any plant");
+      }
+      else{
+        plants=xmlDoc.getElementsByTagName("PLANT");
+        plantNodeList=plants.item(0).childNodes;
+        html_text+="<tbody>";
+        // html_text+="<tr>";
+        x=200;  y=200;
+
+
+      // output out the values
+
+        var commArray = new Array();
+        var botaArray = new Array();
+        var zoneArray = new Array();
+        var lightArray = new Array();
+        var priceArray = new Array();
+        var imgArray = new Array();
+
+     
+
+        for(i=0;i<plants.length;i++) //do for all plants
+        {  
+      	 plantNodeList=plants.item(i).childNodes; //get properties of a plant
+          //   html_text+="<tr>";      //start a new row of the output table
+
+          for(j=0;j<plantNodeList.length;j++)
+          {  
+            curr = plantNodeList.item(j);
+            if (curr.nodeType==ELEMENT_NODE){
+
+          	 if (curr.nodeName=="COMMON"){
+                if(curr.hasChildNodes()) {
+                    if(curr.firstChild.textContent == " "){
+                        commArray[i] = "<td>&nbsp</td>";
+                    }
+                    else{
+          		        commArray[i] = "<td><span>"+curr.firstChild.textContent+"</span></td>";
+                    }
+                }
+                else{
+                    commArray[i] = "<td>N/A</td>";
+                }
+          	 }
+
+          	 if (curr.nodeName=="BOTANICAL"){
+                if(curr.hasChildNodes()) {
+                    if(curr.firstChild.textContent == " "){
+                        botaArray[i] = "<td>&nbsp</td>";
+                    }
+                    else{
+                        botaArray[i] = "<td><span>"+curr.firstChild.textContent+"</span></td>";
+                    }
+                }
+                else{
+                    botaArray[i] = "<td>N/A</td>";
+                }
+          	 }
+
+          	 if (curr.nodeName=="ZONE"){
+                if(curr.hasChildNodes()) {
+                     if(curr.firstChild.textContent == " "){
+                        zoneArray[i] = "<td>&nbsp</td>";
+                    }
+                    else{ 
+                        zoneArray[i] = "<td><span>"+curr.firstChild.textContent+"</span></td>";
+                    }
+                }
+                else{
+                    zoneArray[i] = "<td>N/A</td>";
+                }
+          	 }
+
+          	 if (curr.nodeName=="LIGHT"){
+                if(curr.hasChildNodes()) {
+                    if(curr.firstChild.textContent == " "){
+                        lightArray[i] = "<td>&nbsp</td>";
+                    }
+                    else{
+                        lightArray[i] = "<td><span>"+curr.firstChild.textContent+"</span></td>";
+                    }
+                }
+                else{
+                    lightArray[i] = "<td>N/A</td>";
+                }	
+          	 }
+
+          	 if (curr.nodeName=="PRICE"){
+                if(curr.hasChildNodes()) {
+                    if(curr.firstChild.textContent == " "){
+                        priceArray[i] = "<td>&nbsp</td>";
+                    }
+                    else{
+                        priceArray[i] = "<td><span>"+curr.firstChild.textContent+"<span></td>";
+                    }
+                }
+                else{
+                    priceArray[i] = "<td>N/A</td>";
+                }
+          	 }
+
+             if(curr.nodeName=="IMAGE"){
+                if(curr.hasChildNodes()) {
+                     if(curr.firstChild.textContent == " "){
+                        imgArray[i] = "<td>&nbsp</td>";
+                    }
+                    else{
+                    //handle images
+                        imgArray[i] = "<td><span><img src='"+curr.firstChild.textContent+
+              "' width='"+x+"' height='"+y+"'></span></td>"; 
+                    } 
+                }
+                else{
+                    imgArray[i] = "<td>N/A</td>";
+                }
+    		 }
+		}  		
+	   }
+	}
+			
+			for(i=0;i<plants.length;i++){
+				html_text += "<tr>"+commArray[i]+botaArray[i]+zoneArray[i]+lightArray[i]+priceArray[i]+imgArray[i]+"</tr>";
+			}	 
+      
+      html_text+="</tbody>";  
+      html_text+="</table>";
+      html_text+="</bo"+"dy></html>";
+
+      resultWin = window.open("", "Homework 4", "scrollbars=1, height=800, width=800");
+      resultWin.document.write(html_text);  
+    }
+
+  }
+  
+
+	</script>
+</head>
+
+<body>
+<p style="text-align:center; margin-top:50px">Enter URL for Plant Catalogue XML File</p>
+
+<form action="" style="text-align:center">
+<input type="url" name="plantfile" id="url_box"><br>
+</form>
+
+<div class="wrapper">
+<button class="button" type="submit" onClick="viewXML();" id="btn" value="submit">Submit Query</button>
+</div>
+
+<noscript>
+</body>
+
+
+</html>
